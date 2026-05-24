@@ -1713,16 +1713,27 @@
 
            FULL RESPONSIVE SYSTEM — ALL DEVICES
            Breakpoints:
-           xs:  <= 480px   (small phones)
-           sm:  <= 600px   (large phones)
-           md:  <= 768px   (tablets portrait)
-           lg:  <= 1024px  (tablets landscape / small laptops)
-           xl:  <= 1280px  (laptops)
-           2xl: >  1280px  (desktops / widescreen)
+           xs:  <= 360px   (very small phones — Galaxy Fold, SE)
+           sm:  <= 480px   (small phones — iPhone SE, Galaxy S)
+           md:  <= 600px   (large phones — Pixel, iPhone Plus)
+           lg:  <= 768px   (tablets portrait — iPad mini)
+           xl:  <= 1024px  (tablets landscape / small laptops)
+           2xl: <= 1280px  (standard laptops)
+           3xl: > 1280px   (desktops / widescreen / 4K)
         ===================================================== */
 
+        /* --- 4K / ULTRA-WIDE (>1920px) --- */
+        @media (min-width: 1921px) {
+            :root { --sidebar-width: 320px; }
+            .main-workspace { padding: 50px 60px; max-width: 1800px; margin-left: var(--sidebar-width); }
+            .studio-grid { grid-template-columns: 1.1fr 0.9fr; gap: 40px; }
+            .analytics-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+            .screen-title h1 { font-size: 2.4em; }
+            .lib-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        }
+
         /* --- LARGE DESKTOP (>1280px) — Keep sidebar wide, full grid --- */
-        @media (min-width: 1281px) {
+        @media (min-width: 1281px) and (max-width: 1920px) {
             :root { --sidebar-width: 280px; }
             .studio-grid { grid-template-columns: 1.1fr 0.9fr; gap: 30px; }
             .analytics-grid { grid-template-columns: repeat(4, 1fr); }
@@ -1745,10 +1756,17 @@
             .studio-panel { min-height: auto; }
             .output-panel { min-height: auto; }
             .output-content-area { max-height: 420px; }
+            .canvas-empty { min-height: 250px; }
             .analytics-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
             .analytics-main-panel { grid-template-columns: 1fr; gap: 20px; }
             .glass-card { padding: 24px; }
             .lib-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+
+            /* Output actions: 2-column on tablets */
+            .output-actions-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
         }
 
         /* --- TABLET PORTRAIT (<=768px) --- */
@@ -1763,6 +1781,7 @@
                 top: 0;
                 z-index: 100;
                 padding: 14px 16px 10px;
+                padding-top: max(14px, env(safe-area-inset-top));
                 border-right: none;
                 border-bottom: 1px solid var(--glass-border);
                 backdrop-filter: blur(30px);
@@ -1780,8 +1799,9 @@
                 overflow-x: auto;
                 gap: 6px;
                 padding-bottom: 4px;
-                scrollbar-width: none; /* hide scrollbar on mobile */
+                scrollbar-width: none;
                 -ms-overflow-style: none;
+                -webkit-overflow-scrolling: touch;
             }
 
             .nav-menu::-webkit-scrollbar { display: none; }
@@ -1812,6 +1832,7 @@
                 margin-left: 0;
                 width: 100%;
                 padding: 20px 16px;
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
                 min-height: calc(100vh - 120px);
             }
 
@@ -1827,6 +1848,10 @@
 
             /* Glass cards tighter */
             .glass-card { padding: 20px 16px; border-radius: 16px; }
+
+            /* Studio panels lose min-height */
+            .studio-panel, .output-panel { min-height: auto; }
+            .canvas-empty { min-height: 200px; }
 
             /* Forms collapse to single column */
             .form-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -1855,10 +1880,11 @@
             /* Output content shorter */
             .output-content-area { max-height: 350px; }
             .field-textarea { min-height: 160px; }
+            .output-textarea { min-height: 250px; }
 
             /* Panel heading stacks on small */
             .panel-heading { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .toggle-tab-group { width: 100%; justify-content: flex-start; }
+            .toggle-tab-group { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
 
             /* Shorthand layout single column */
             .shorthand-layout { grid-template-columns: 1fr; }
@@ -1870,7 +1896,7 @@
 
             /* Toast adjusted for mobile */
             .toast-container {
-                bottom: 20px;
+                bottom: max(20px, env(safe-area-inset-bottom));
                 right: 16px;
                 left: 16px;
             }
@@ -1881,6 +1907,25 @@
                 width: 100%;
                 right: -100%;
                 height: 100vh;
+                height: 100dvh; /* dynamic viewport height for mobile browsers */
+                border-left: none;
+            }
+
+            .chat-drawer.open {
+                right: 0;
+            }
+
+            /* AI settings pane — override inline max-width */
+            #pane-settings .glass-card > div {
+                max-width: 100% !important;
+            }
+
+            /* AI config test/save buttons stack on small */
+            #aiConfigSection > div:last-child {
+                flex-direction: column;
+            }
+            #aiConfigSection > div:last-child .btn-action {
+                width: 100%;
             }
         }
 
@@ -1916,6 +1961,8 @@
             .cornell-cue-col { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
 
             .output-content-area { max-height: 300px; padding: 16px; }
+            .canvas-empty { min-height: 180px; }
+            .canvas-empty i { font-size: 2.2em; margin-bottom: 14px; }
             .field-textarea { min-height: 140px; }
 
             .panel-title { font-size: 1.05em; }
@@ -1926,8 +1973,21 @@
             /* Analytics main panel */
             .analytics-main-panel { gap: 14px; }
 
-            /* Sidebar horizontal scroll items icon-only */
+            /* Sidebar horizontal scroll items */
             .sidebar { padding: 12px 12px 8px; }
+
+            /* Chat drawer adjustments */
+            .chat-messages { padding: 14px 12px; }
+            .chat-bubble { max-width: 90%; font-size: 0.82em; }
+            .chat-suggested-prompts { padding: 0 12px 12px; }
+
+            /* Keyword cloud wraps tighter */
+            .keyword-cloud { gap: 6px; }
+            .kw-chip { padding: 5px 10px; font-size: 0.75em; }
+
+            /* Library card responsive */
+            .lib-card { padding: 16px; min-height: auto; }
+            .lib-card-actions { flex-wrap: wrap; }
         }
 
         /* --- SMALL PHONES (<=480px) --- */
@@ -1976,6 +2036,9 @@
 
             /* Output area */
             .output-content-area { padding: 14px; max-height: 280px; }
+            .canvas-empty { min-height: 150px; }
+            .canvas-empty i { font-size: 2em; margin-bottom: 12px; }
+            .canvas-empty p { font-size: 0.78em; }
             .markdown-preview { font-size: 0.85em; }
 
             /* Action buttons stack fully */
@@ -1994,8 +2057,8 @@
             .file-name-text { max-width: 160px; }
 
             /* Toggle tab group full width */
-            .toggle-tab-group { width: 100%; }
-            .tab-toggle-btn { flex: 1; text-align: center; padding: 6px 8px; font-size: 0.75em; }
+            .toggle-tab-group { width: 100%; flex-wrap: wrap; }
+            .tab-toggle-btn { flex: 1; text-align: center; padding: 6px 8px; font-size: 0.75em; min-width: 0; }
 
             /* Panel headings */
             .panel-heading { gap: 8px; margin-bottom: 16px; padding-bottom: 10px; }
@@ -2015,7 +2078,7 @@
             .gauge-inner-text { font-size: 1.4em; }
 
             /* Toast container */
-            .toast-container { bottom: 14px; right: 10px; left: 10px; }
+            .toast-container { bottom: max(14px, env(safe-area-inset-bottom)); right: 10px; left: 10px; }
             .toast-alert { padding: 12px; border-radius: 10px; }
             .toast-title { font-size: 0.82em; }
             .toast-message { font-size: 0.72em; }
@@ -2023,22 +2086,101 @@
             /* Chat drawer full screen */
             .chat-drawer { width: 100%; border-left: none; }
             .chat-header { padding: 18px 16px; }
+            .chat-header-title { font-size: 0.95em; }
             .chat-messages { padding: 14px; }
-            .chat-input-area { padding: 14px; }
+            .chat-input-area { padding: 14px; padding-bottom: max(14px, env(safe-area-inset-bottom)); }
             .chat-suggest-btn { font-size: 0.7em; padding: 7px 10px; }
+
+            /* Markdown table scrollable */
+            .markdown-preview table { display: block; overflow-x: auto; white-space: nowrap; }
+            .markdown-preview th, .markdown-preview td { padding: 8px 10px; font-size: 0.85em; }
         }
 
-        /* --- VERY SMALL PHONES (<=360px) --- */
+        /* --- VERY SMALL PHONES (<=360px) — Galaxy Fold, iPhone SE 1st gen --- */
         @media (max-width: 360px) {
             .main-workspace { padding: 12px 8px; }
-            .glass-card { padding: 12px 10px; }
+            .glass-card { padding: 12px 10px; border-radius: 10px; }
             .screen-title h1 { font-size: 1.15em; }
+            .screen-title p { font-size: 0.75em; }
             .brand-name { display: none; } /* text hidden, only logo */
             .action-submit-btn { padding: 12px 14px; font-size: 0.85em; }
             .analytics-grid { grid-template-columns: 1fr; }
+            .anal-card { padding: 10px 8px; }
+
+            /* Sidebar ultra-compact */
+            .sidebar { padding: 10px 8px 6px; }
+            .nav-item { padding: 6px 8px; font-size: 0.68em; }
+            .brand-logo { width: 28px; height: 28px; font-size: 0.85em; }
+
+            /* Form elements smaller */
+            .field-input, .field-select { padding: 9px 10px; }
+            .field-textarea { min-height: 100px; }
+
+            /* Upload canvas ultra-compact */
+            .upload-canvas { padding: 14px 8px; margin-bottom: 12px; }
+            .upload-canvas-icon { font-size: 1.8em; margin-bottom: 6px; }
+            .upload-canvas h3 { font-size: 0.85em; }
+            .upload-canvas p { font-size: 0.72em; margin-bottom: 10px; }
+            .u-badge { padding: 2px 5px; font-size: 0.6em; }
+
+            /* Output even tighter */
+            .output-content-area { max-height: 240px; padding: 12px; }
+            .canvas-empty { min-height: 120px; }
+            .canvas-empty i { font-size: 1.6em; }
+
+            /* Gauge very small */
+            .gauge-svg { width: 90px; height: 90px; }
+            .gauge-inner-text { font-size: 1.2em; }
+            .ratio-gauge-box { padding: 16px 12px; }
+
+            /* Toggle tabs wrap */
+            .tab-toggle-btn { font-size: 0.68em; padding: 5px 6px; }
+
+            /* Chat ultra-compact */
+            .chat-bubble { max-width: 92%; font-size: 0.78em; padding: 10px 12px; }
+            .chat-input { font-size: 0.8em; padding: 8px 10px; }
+            .chat-send-btn { width: 36px; height: 36px; font-size: 0.8em; }
+
+            /* Dictionary table tighter */
+            .dict-table { font-size: 0.72em; }
+            .dict-table th, .dict-table td { padding: 7px 8px; }
+            .dict-badge { font-size: 0.7em; padding: 1px 4px; }
+
+            /* Library card extra compact */
+            .lib-card { padding: 12px; }
+            .lib-tag { font-size: 0.65em; padding: 3px 6px; }
+            .lib-btn { font-size: 0.7em; padding: 6px; }
+
+            /* Keyword chips smaller */
+            .kw-chip { padding: 4px 8px; font-size: 0.7em; }
+            .kw-weight { font-size: 0.65em; }
         }
 
-        /* --- PRINT STYLES — already @media print in the existing code --- */
+        /* --- LANDSCAPE PHONES (short viewport height) --- */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar {
+                padding: 8px 10px 6px;
+            }
+            .brand { margin-bottom: 6px; }
+            .brand-logo { width: 28px; height: 28px; }
+            .nav-item { padding: 6px 10px; font-size: 0.75em; min-height: 36px; }
+
+            .main-workspace { padding: 12px 16px; }
+            .screen-header { margin-bottom: 12px; }
+            .screen-title h1 { font-size: 1.3em; }
+
+            .upload-canvas { padding: 14px 12px; margin-bottom: 12px; }
+            .canvas-empty { min-height: 120px; }
+            .output-content-area { max-height: 200px; }
+            .field-textarea { min-height: 100px; }
+
+            .chat-drawer {
+                height: 100vh;
+                height: 100dvh;
+            }
+        }
+
+        /* --- PRINT STYLES --- */
     </style>
 </head>
 <body>
